@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator zod {
+  provider         = "zod-prisma-types"
+  output           = "../src/generated/zod/"
+  useMultipleFiles = true
+  createInputTypes = false
+  writeBarrelFiles = false
+}
+
+model Customer {
+  id              Int               @id @default(autoincrement())
+  nombre_fantasia String            @unique(map: "Empresa_nombre_fantasia_key")
+  razon_social    String            @unique(map: "Empresa_razon_social_key")
+  RUT             String            @unique(map: "Empresa_RUT_key")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime
+  users           User[]
+  Invoice         Invoice[]
+  BalanceMovement BalanceMovement[]
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique(map: "Usuario_email_key")
+  name       String
+  password   String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  customerId Int?
+  customer   Customer? @relation(fields: [customerId], references: [id], map: "Usuario_empresaId_fkey")
+  orders     Order[]
+
+  @@index([customerId], map: "User_customerId_fkey")
+}
+
+model Order {
+  id                    Int                     @id @default(autoincrement())
+  description           String
+  userId                Int
+  user                  User                    @relation(fields: [userId], references: [id], map: "Order_usuarioId_fkey")
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  shippings             Shipping[]
+  ShippingStatusHistory ShippingStatusHistory[]
+  Invoice               Invoice?                @relation(fields: [invoiceId], references: [id])
+  invoiceId             Int?
+
+  @@index([userId], map: "Order_userId_fkey")
+}
+
+model Shipping {
+  id           Int            @id @default(autoincrement())
+  orderId      Int
+  order        Order          @relation(fields: [orderId], references: [id])
+  fromAddress  String
+  toAddress    String
+  contactName  String?
+  contactPhone String?
+  trackingId   String         @unique
+  carrier      String
+  status       ShippingStatus @default(pendiente)
+  sequence     Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  invoiceId    Int?
+  invoice      Invoice?       @relation(fields: [invoiceId], references: [id])
+}
+
+model ShippingStatusHistory {
+  id        Int            @id @default(autoincrement())
+  orderId   Int
+  order     Order          @relation(fields: [orderId], references: [id])
+  status    ShippingStatus
+  changedAt DateTime       @default(now())
+}
+
+enum ShippingStatus {
+  pendiente
+  en_camino
+  entregado
+  cancelado
+}
+
+model Invoice {
+  id         Int               @id @default(autoincrement())
+  number     String
+  fileBase64 String
+  createdAt  DateTime          @default(now())
+  customerId Int
+  customer   Customer          @relation(fields: [customerId], references: [id])
+  orders     Order[]
+  movements  BalanceMovement[]
+  Shipping   Shipping[]
+}
+
+model BalanceMovement {
+  id          Int      @id @default(autoincrement())
+  description String
+  amount      Int // negativo = deuda, positivo = pago
+  customerId  Int
+  customer    Customer @relation(fields: [customerId], references: [id])
+  invoiceId   Int?
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@map("Balance")
+}

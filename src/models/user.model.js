@@ -1,0 +1,18 @@
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+export const createUser = async (userData) => {
+  return prisma.user.create({ data: userData })
+}
+
+export const findUserByEmail = async (email) => {
+  return prisma.user.findUnique({ where: { email } })
+}
+
+export const updateUserPassword = async (email, newPassword) => {
+  return prisma.user.update({
+    where: { email },
+    data: { password: newPassword }
+  })
+}

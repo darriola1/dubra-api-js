@@ -43,9 +43,9 @@ model User {
   customerId Int?
   customer   Customer? @relation(fields: [customerId], references: [id], map: "Usuario_empresaId_fkey")
   orders     Order[]
-
   @@index([customerId], map: "User_customerId_fkey")
 }
+
 
 model Order {
   id                    Int                     @id @default(autoincrement())

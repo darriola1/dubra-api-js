@@ -1,4 +1,4 @@
-import { UserSchema } from '../generated/zod/UserSchema.js'
+import { UserSchema } from '../generated/zod/modelSchema/UserSchema.ts'
 
 export const RegisterSchema = UserSchema.pick({
   email: true,

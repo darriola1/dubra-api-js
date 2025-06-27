@@ -1,11 +1,12 @@
 // imports de paquetes
 import express, { json } from "express";
 import dotenv from "dotenv";
-
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 // imports de servicios
 
 // imports de codigo nuestro
-import authRoutes from "./routes/authRoutes.js";
+import {AuthRouter} from "./routes/auth.routes.js";
 
 dotenv.config();
 
@@ -21,6 +22,17 @@ app.use(
 );
 // habilitamos el parseo de json
 app.use(json());
+// ################################################################################################################
+// Descomentar para debugg
+app.use((req, res, next) => {
+    console.log(`Request: ${req.method} ${req.url}`);
+    console.log('Headers:', req.headers);
+    console.log('Body:', req.body);
+    console.log('User: ', req.user)
+    next();
+});
+// ################################################################################################################
+
 //habilit en express la lectura de cookies
 app.use(cookieParser());
 // Se deshabilita el header 'x-powered-by' por "seguridad".
@@ -30,7 +42,7 @@ app.get("/", (_req, res) => {
   res.send(`🚀 Dubra API funcionando correctamente ${PORT}`);
 });
 // Rutas
-app.use("/auth", authRoutes);
+app.use("/auth", AuthRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

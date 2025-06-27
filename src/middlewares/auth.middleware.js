@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 // import CustomError from "../utils/custom.error.js";
-import { logger } from "../services/logger.js";
+import { logger } from "../utils/logger.js";
 
-export const authMiddleware = (req, res, next) => {
+export const AuthMiddleware = (req, res, next) => {
 //   console.log("Auth middleware triggered"); // Log para depuración
   // Primero intentamos obtener el token desde la cookie
   let token = req.cookies?.token;

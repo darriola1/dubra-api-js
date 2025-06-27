@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 
 // imports de codigo nuestro
 import {AuthRouter} from "./routes/auth.routes.js";
+import {OrderRouter} from './routes/order.routes.js'
 
 dotenv.config();
 
@@ -41,8 +42,10 @@ app.disable("x-powered-by");
 app.get("/", (_req, res) => {
   res.send(`🚀 Dubra API funcionando correctamente ${PORT}`);
 });
+
 // Rutas
 app.use("/auth", AuthRouter);
+app.use("/orders", OrderRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({

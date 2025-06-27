@@ -73,14 +73,10 @@ model Shipping {
   contactName  String?
   contactPhone String?
   trackingId   String         @unique
-  carrier      String
   status       ShippingStatus @default(pendiente)
-  sequence     Int
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  invoiceId    Int?
-  invoice      Invoice?       @relation(fields: [invoiceId], references: [id])
-}
+  }
 
 model ShippingStatusHistory {
   id        Int            @id @default(autoincrement())
@@ -106,7 +102,6 @@ model Invoice {
   customer   Customer          @relation(fields: [customerId], references: [id])
   orders     Order[]
   movements  BalanceMovement[]
-  Shipping   Shipping[]
 }
 
 model BalanceMovement {

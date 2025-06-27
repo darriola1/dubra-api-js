@@ -2,11 +2,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as userModel from "../models/user.model.js";
 import { reCAPTCHA } from "../services/recaptcha.js";
-import { logger } from "../services/logger.js";
+import { logger } from "../utils/logger.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export const AuthController = {
+export class AuthController {
   async register(req, res) {
     const { name, email, password, recaptchaToken } = req.body;
     console.log("name:", name);
@@ -46,7 +46,7 @@ export const AuthController = {
       logger.error("Error en el registro de usuario:", err);
       res.status(500).json({ error: "Error al registrar usuario" });
     }
-  },
+  }
 
   async login(req, res) {
     const { email, password, recaptchaToken } = req.body;
@@ -96,7 +96,7 @@ export const AuthController = {
       logger.error("Error en el login:", err);
       res.status(500).json({ error: "Error al iniciar sesión" });
     }
-  },
+  }
 
   async changePassword(req, res) {
     const { email, password, newPassword, recaptchaToken } = req.body;
@@ -135,7 +135,7 @@ export const AuthController = {
       logger.error("Error al cambiar contraseña:", err);
       res.status(500).json({ error: "Error al cambiar la contraseña" });
     }
-  },
+  }
 
   async me(req, res) {
     try {
@@ -157,7 +157,7 @@ export const AuthController = {
         .status(500)
         .json({ error: "Error al obtener información del usuario" });
     }
-  },
+  }
 
   logout(_req, res) {
     try {
@@ -172,5 +172,5 @@ export const AuthController = {
       logger.error("Error al cerrar sesión:", err);
       res.status(500).json({ error: "Error al cerrar la sesión" });
     }
-  },
+  }
 };

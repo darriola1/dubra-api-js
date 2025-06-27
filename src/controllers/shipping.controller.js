@@ -1,8 +1,8 @@
 import * as shippingModel from '../models/shipping.model.js'
 import { logger } from '../utils/logger.js'
 
-export const ShippingController = {
-  async create(req, res) {
+export class ShippingController {
+  create = async (req, res) => {
     const { orderId } = req.params
     const shippingData = req.validatedData
 
@@ -16,9 +16,9 @@ export const ShippingController = {
       logger.error('Error al crear envío:', err)
       res.status(500).json({ error: 'No se pudo crear el envío' })
     }
-  },
+  }
 
-  async findByOrder(req, res) {
+  findByOrder = async (req, res) => {
     const { orderId } = req.params
     try {
       const shippings = await shippingModel.findShippingsByOrder(parseInt(orderId))
@@ -27,9 +27,9 @@ export const ShippingController = {
       logger.error('Error al obtener envíos de la orden:', err)
       res.status(500).json({ error: 'Error interno al listar envíos' })
     }
-  },
-
-  async findById(req, res) {
+  }
+  
+  findById = async (req, res) => {
     const { id } = req.params
     try {
       const shipping = await shippingModel.findShippingById(parseInt(id))
@@ -39,9 +39,9 @@ export const ShippingController = {
       logger.error('Error al obtener envío:', err)
       res.status(500).json({ error: 'Error interno' })
     }
-  },
+  }
 
-  async update(req, res) {
+  update = async (req, res) => {
     const { id } = req.params
     try {
       const updated = await shippingModel.updateShipping(parseInt(id), req.validatedData)
@@ -50,9 +50,9 @@ export const ShippingController = {
       logger.error('Error al actualizar envío:', err)
       res.status(500).json({ error: 'No se pudo actualizar el envío' })
     }
-  },
+  }
 
-  async remove(req, res) {
+  remove = async (req, res) => {
     const { id } = req.params
     try {
       await shippingModel.deleteShipping(parseInt(id))

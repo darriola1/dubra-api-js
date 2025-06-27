@@ -2,7 +2,7 @@ import * as orderModel from '../models/order.model.js'
 import { logger } from '../utils/logger.js'
 
 export class OrderController  {
-  async create(req, res) {
+  create = async (req, res) => {
     const { description } = req.validatedData
     const userId = req.user.userId
 
@@ -15,7 +15,7 @@ export class OrderController  {
     }
   }
 
-  async findAll(req, res) {
+  findAll = async (req, res) => {
     try {
       const orders = await orderModel.findAllOrders()
       res.json({ orders })
@@ -25,7 +25,7 @@ export class OrderController  {
     }
   }
 
-  async findByUser(req, res) {
+  findByUser = async (req, res) => {
     const userId = req.user.userId
     try {
       const orders = await orderModel.findOrdersByUser(userId)
@@ -36,7 +36,7 @@ export class OrderController  {
     }
   }
 
-  async findById(req, res) {
+  findById = async (req, res) => {
     const id = parseInt(req.params.id)
     try {
       const order = await orderModel.findOrderById(id)
@@ -48,7 +48,7 @@ export class OrderController  {
     }
   }
 
-  async update(req, res) {
+  update = async (req, res) => {
     const id = parseInt(req.params.id)
     try {
       const order = await orderModel.updateOrder(id, req.validatedData)
@@ -59,7 +59,7 @@ export class OrderController  {
     }
   }
 
-  async remove(req, res) {
+  remove = async (req, res) => {
     const id = parseInt(req.params.id)
     try {
       await orderModel.deleteOrder(id)

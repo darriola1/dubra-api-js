@@ -7,7 +7,7 @@ import { logger } from "../utils/logger.js";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export class AuthController {
-  async register(req, res) {
+  register = async (req, res) => {
     const { name, email, password, recaptchaToken } = req.body;
     console.log("name:", name);
     console.log("email:", email);
@@ -48,7 +48,7 @@ export class AuthController {
     }
   }
 
-  async login(req, res) {
+  login = async (req, res) => {
     const { email, password, recaptchaToken } = req.body;
     const isDev = process.env.NODE_ENV === "development";
 
@@ -98,7 +98,7 @@ export class AuthController {
     }
   }
 
-  async changePassword(req, res) {
+  changePassword = async (req, res) => {
     const { email, password, newPassword, recaptchaToken } = req.body;
 
     try {
@@ -137,7 +137,7 @@ export class AuthController {
     }
   }
 
-  async me(req, res) {
+  me = async (req, res) => {
     try {
       if (!req.user) {
         return res.status(401).json({ error: "No autorizado" });
@@ -159,7 +159,7 @@ export class AuthController {
     }
   }
 
-  logout(_req, res) {
+  logout = async (req, res) => {
     try {
       res.clearCookie("token", {
         httpOnly: true,

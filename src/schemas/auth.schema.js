@@ -1,18 +1,18 @@
-import { UserSchema } from '../generated/zod/modelSchema/UserSchema.ts'
+import { z } from "zod";
 
-export const RegisterSchema = UserSchema.pick({
-  email: true,
-  password: true,
-  name: true
-})
+export const RegisterSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6).max(100),
+  name: z.string().min(2).max(100)
+});
 
-export const LoginSchema = UserSchema.pick({
-  email: true,
-  password: true
-})
+export const LoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6).max(100)
+});
 
-export const ChangePasswordSchema = UserSchema.pick({
-  email: true,
-  password: true,
-  newPassword: true
+export const ChangePasswordSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6).max(100),
+  newPassword: z.string().min(6).max(100)
 })

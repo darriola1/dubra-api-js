@@ -44,6 +44,21 @@ app.get("/", (_req, res) => {
 // Rutas
 app.use("/auth", AuthRouter);
 
+app.use((req, res, next) => {
+  res.status(404).json({
+    error: "Not Found",
+    message: "The requested resource could not be found",
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log del error en consola
+  res.status(500).json({
+    error: "Internal Server Error",
+    message: err.message || "An unexpected error occurred",
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

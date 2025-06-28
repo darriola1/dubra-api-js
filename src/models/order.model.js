@@ -1,13 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
-function generateOrderCode() {
-  return 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase()
-}
-
 export const createOrder = async ({ description, userId }) => {
-  const code = generateOrderCode()
-  return prisma.order.create({ data: { code, description, userId } })
+  if (!description || !userId) {
+    throw new Error('Description and userId are required to create an order')
+  }
+  return prisma.order.create({ data: { description, userId } })
 }
 
 export const findAllOrders = async () => {

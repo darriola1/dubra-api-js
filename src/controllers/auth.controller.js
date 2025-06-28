@@ -9,10 +9,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 export class AuthController {
   register = async (req, res) => {
     const { name, email, password, recaptchaToken } = req.body;
-    console.log("name:", name);
-    console.log("email:", email);
-    console.log("password:", password);
-    console.log("recaptchaToken:", recaptchaToken);
+    // console.log("name:", name);
+    // console.log("email:", email);
+    // console.log("password:", password);
+    // console.log("recaptchaToken:", recaptchaToken);
 
     try {
       const isHuman = await reCAPTCHA(recaptchaToken);
@@ -123,7 +123,7 @@ export class AuthController {
         email,
         newHashedPassword
       );
-      console.log(result);
+      // console.log(result);
       if (!result)
         return res
           .status(500)
@@ -142,7 +142,7 @@ export class AuthController {
       if (!req.user) {
         return res.status(401).json({ error: "No autorizado" });
       }
-      console.log("User ID from token:", req.user.userId);
+      // console.log("User ID from token:", req.user.userId);
       const user = await userModel.findUserByid(req.user.userId);
       const data = {
         id: user.id,

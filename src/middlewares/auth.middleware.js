@@ -6,7 +6,7 @@ export const AuthMiddleware = (req, res, next) => {
 //   console.log("Auth middleware triggered"); // Log para depuración
   // Primero intentamos obtener el token desde la cookie
   let token = req.cookies?.token;
-  console.log("Token from cookie:", token); // Log para depuración
+  // console.log("Token from cookie:", token); // Log para depuración
 
   // Si no está en la cookie, intentamos desde el header
   if (!token && req.headers.authorization?.startsWith("Bearer ")) {
@@ -15,7 +15,7 @@ export const AuthMiddleware = (req, res, next) => {
 
   if (!token) {
     // throw CustomError.unauthorized("Token is missing");
-    res.status(401).json({
+    return res.status(401).json({
       error: "Unauthorized",
       message: "Token is missing",
     });

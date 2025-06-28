@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 // imports de codigo nuestro
 import {AuthRouter} from "./routes/auth.routes.js";
 import {OrderRouter} from './routes/order.routes.js'
+import {ShippingRouter} from './routes/shipping.routes.js';
 
 dotenv.config();
 
@@ -25,13 +26,13 @@ app.use(
 app.use(json());
 // ################################################################################################################
 // Descomentar para debugg
-app.use((req, res, next) => {
-    console.log(`Request: ${req.method} ${req.url}`);
-    console.log('Headers:', req.headers);
-    console.log('Body:', req.body);
-    console.log('User: ', req.user)
-    next();
-});
+// app.use((req, res, next) => {
+//     console.log(`Request: ${req.method} ${req.url}`);
+//     console.log('Headers:', req.headers);
+//     console.log('Body:', req.body);
+//     console.log('User: ', req.user)
+//     next();
+// });
 // ################################################################################################################
 
 //habilit en express la lectura de cookies
@@ -44,8 +45,9 @@ app.get("/", (_req, res) => {
 });
 
 // Rutas
-app.use("/auth", AuthRouter);
-app.use("/orders", OrderRouter);
+app.use("/api/auth", AuthRouter);
+app.use("/api/order", OrderRouter);
+app.use("/api/shipping", ShippingRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({
@@ -62,6 +64,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server running on http://localhost:${PORT}`);
+// });
+
+export default app;

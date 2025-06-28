@@ -6,18 +6,19 @@ import { RegisterSchema, LoginSchema, ChangePasswordSchema } from '../schemas/au
 // import { authLimiter } from '@/shared/middlewares/rateLimiter.js';
 
 export const AuthRouter = Router();
+const authController = new AuthController()
 
 // Route to register user with validation
-AuthRouter.post("/register", ValidateBody(RegisterSchema), (req, res) => AuthController.register(req, res));
+AuthRouter.post("/register", ValidateBody(RegisterSchema), (req, res) => authController.register(req, res));
 // Route to login with validation
-AuthRouter.post("/login", ValidateBody(LoginSchema), (req, res) => AuthController.login(req, res));
+AuthRouter.post("/login", ValidateBody(LoginSchema), (req, res) => authController.login(req, res));
 // Route to get user profile
 AuthRouter.get("/me", AuthMiddleware, (req, res) =>
-  AuthController.me(req, res)
+  authController.me(req, res)
 );
 // Route to change password with validation
 AuthRouter.post("/change-password", ValidateBody(ChangePasswordSchema), AuthMiddleware, (req, res) =>
-  AuthController.changePassword(req, res)
+  authController.changePassword(req, res)
 );
 // Route to logout
-AuthRouter.post("/logout", AuthMiddleware, (req, res) => AuthController.logout(req, res));
+AuthRouter.post("/logout", AuthMiddleware, (req, res) => authController.logout(req, res));

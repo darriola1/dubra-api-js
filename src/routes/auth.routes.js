@@ -10,15 +10,16 @@ const authController = new AuthController()
 
 // Route to register user with validation
 AuthRouter.post("/register", ValidateBody(RegisterSchema), (req, res) => authController.register(req, res));
-// Route to login with validation
+
+// Route to login user with validation
 AuthRouter.post("/login", ValidateBody(LoginSchema), (req, res) => authController.login(req, res));
-// Route to get user profile
+
 AuthRouter.get("/me", AuthMiddleware, (req, res) =>
   authController.me(req, res)
 );
-// Route to change password with validation
+
 AuthRouter.post("/change-password", ValidateBody(ChangePasswordSchema), AuthMiddleware, (req, res) =>
   authController.changePassword(req, res)
 );
-// Route to logout
+
 AuthRouter.post("/logout", AuthMiddleware, (req, res) => authController.logout(req, res));

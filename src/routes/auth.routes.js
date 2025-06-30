@@ -23,4 +23,4 @@ AuthRouter.post("/change-password", authLimiter, ValidateBody(ChangePasswordSche
   authController.changePassword(req, res)
 );
 
-AuthRouter.post("/logout", authLimiter, AuthMiddleware, (req, res) => authController.logout(req, res));
+AuthRouter.post("/logout", AuthMiddleware, (req, res) => authController.logout(req, res));

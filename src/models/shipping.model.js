@@ -20,12 +20,41 @@ export const findShippingById = async (id) => {
   return prisma.shipping.findUnique({ where: { id } })
 }
 
-export const findShippingsByOrder = async (orderId) => {
+export const findShippingsByUser = async (userId) => {
   return prisma.shipping.findMany({
-    where: { orderId },
+    where: { userId },
     orderBy: { createdAt: 'desc' }
   })
 }
+
+export const findAllShippings = async ({ search, status, limit, offset }) => {
+  try {
+    const shippings = await prisma.shipping.findMany({
+      where: {
+        // Filtrado por búsqueda de texto (en direcciones, nombres, etc.)
+        AND: [
+          search ? {
+            OR: [
+              { fromAddress: { contains: search, mode: 'insensitive' } },
+              { toAddress: { contains: search, mode: 'insensitive' } },
+              { contactName: { contains: search, mode: 'insensitive' } },
+            ]
+          } : {},
+          status ? { status: status } : {},
+        ]
+      },
+      take: limit,  // Limitar los resultados
+      skip: offset, // Desplazamiento para la paginación
+      orderBy: {
+        createdAt: 'desc'  // Ordenar por fecha de creación
+      }
+    });
+
+    return shippings;
+  } catch (err) {
+    throw new Error('Error al obtener los envíos: ' + err.message);
+  }
+};
 
 export const updateShipping = async (id, data) => {
   return prisma.shipping.update({

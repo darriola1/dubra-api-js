@@ -143,7 +143,7 @@ export class AuthController {
         return res.status(401).json({ error: "No autorizado" });
       }
       // console.log("User ID from token:", req.user.userId);
-      const user = await userModel.findUserByid(req.user.userId);
+      const user = await userModel.findUserById(req.user.userId);
       const data = {
         id: user.id,
         email: user.email,

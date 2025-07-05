@@ -17,8 +17,16 @@ export const findUserByEmail = async (email) => {
   return prisma.user.findUnique({ where: { email } });
 };
 
-export const findUserByid = async (id) => {
-  return prisma.user.findUnique({ where: { id } });
+export const findUserById = async (userId) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+    return user;
+  } catch (err) {
+    console.error("Error en la consulta de usuario:", err);
+    throw new Error('No se pudo encontrar el usuario');
+  }
 };
 
 export const updateUserPassword = async (email, newPassword) => {

@@ -19,3 +19,13 @@ export const geoCoderLimiter = rateLimit({
     error: 'Espere 1 segundo antes de realizar un nuevo intento.'
   }
 });
+
+export const trackingLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // Times and tries should be discussed
+  max: 5, 
+  standardHeaders: false, 
+  legacyHeaders: false,
+  message: {
+    error: 'Espere unos momentos para volver a intentar'
+  }
+})

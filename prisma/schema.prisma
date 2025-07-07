@@ -28,29 +28,46 @@ model Customer {
   razon_social    String            @unique(map: "Empresa_razon_social_key")
   RUT             String            @unique(map: "Empresa_RUT_key")
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  updatedAt       DateTime
   users           User[]
   Invoice         Invoice[]
   BalanceMovement BalanceMovement[]
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  email      String     @unique(map: "Usuario_email_key")
+  id         Int       @id @default(autoincrement())
+  email      String    @unique(map: "Usuario_email_key")
   name       String
   password   String
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime?  @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
   customerId Int?
-  customer   Customer?  @relation(fields: [customerId], references: [id], map: "Usuario_empresaId_fkey")
-  shippings  Shipping[]
-  role       String     @default("user")
-
+  customer   Customer? @relation(fields: [customerId], references: [id], map: "Usuario_empresaId_fkey")
+  orders     Order[]
+  role      String   @default("user")
   @@index([customerId], map: "User_customerId_fkey")
+}
+
+
+model Order {
+  id                    Int                     @id @default(autoincrement())
+  description           String
+  userId                Int
+  user                  User                    @relation(fields: [userId], references: [id], map: "Order_usuarioId_fkey")
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  shippings             Shipping[]
+  ShippingStatusHistory ShippingStatusHistory[]
+  Invoice               Invoice?                @relation(fields: [invoiceId], references: [id])
+  invoiceId             Int?
+
+  @@index([userId], map: "Order_userId_fkey")
 }
 
 model Shipping {
   id           Int            @id @default(autoincrement())
+  orderId      Int
+  order        Order          @relation(fields: [orderId], references: [id])
   fromAddress  String
   toAddress    String
   contactName  String?
@@ -59,22 +76,14 @@ model Shipping {
   status       ShippingStatus @default(pendiente)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-
-  Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
-  invoiceId Int?
-  
-  userId                Int?
-  User                  User?                   @relation(fields: [userId], references: [id])
-
-  ShippingStatusHistory ShippingStatusHistory[]
-}
+  }
 
 model ShippingStatusHistory {
-  id         Int            @id @default(autoincrement())
-  shippingId Int
-  shipping   Shipping       @relation(fields: [shippingId], references: [id])
-  status     ShippingStatus
-  changedAt  DateTime       @default(now())
+  id        Int            @id @default(autoincrement())
+  orderId   Int
+  order     Order          @relation(fields: [orderId], references: [id])
+  status    ShippingStatus
+  changedAt DateTime       @default(now())
 }
 
 enum ShippingStatus {
@@ -91,7 +100,7 @@ model Invoice {
   createdAt  DateTime          @default(now())
   customerId Int
   customer   Customer          @relation(fields: [customerId], references: [id])
-  shippings  Shipping[]
+  orders     Order[]
   movements  BalanceMovement[]
 }
 

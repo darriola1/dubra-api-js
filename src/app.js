@@ -7,11 +7,8 @@ import cookieParser from 'cookie-parser';
 
 // imports de codigo nuestro
 import {AuthRouter} from "./routes/auth.routes.js";
+import {OrderRouter} from './routes/order.routes.js'
 import {ShippingRouter} from './routes/shipping.routes.js';
-import {UserRouter} from './routes/user.routes.js';
-import {CustomerRouter} from './routes/customer.routes.js';
-import {InvoiceRouter} from './routes/invoice.routes.js';
-import {BalanceMovementRouter} from './routes/balanceMovement.routes.js';
 
 dotenv.config();
 
@@ -48,12 +45,9 @@ app.get("/", (_req, res) => {
 });
 
 // Rutas
-app.use('/auth', AuthRouter);
-app.use('/shippings', ShippingRouter);
-app.use('/users', UserRouter);
-app.use('/customers', CustomerRouter);
-app.use('/invoices', InvoiceRouter);
-app.use('/balance-movements', BalanceMovementRouter);
+app.use("/api/auth", AuthRouter);
+app.use("/api/order", OrderRouter);
+app.use("/api/shipping", ShippingRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({

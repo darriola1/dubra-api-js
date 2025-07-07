@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import {AuthRouter} from "./routes/auth.routes.js";
 import {OrderRouter} from './routes/order.routes.js'
 import {ShippingRouter} from './routes/shipping.routes.js';
+import { GeocoderRouter } from "./routes/geocoder.routes.js";
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.get("/", (_req, res) => {
 app.use("/api/auth", AuthRouter);
 app.use("/api/order", OrderRouter);
 app.use("/api/shipping", ShippingRouter);
+app.use("/api/geocoder", GeocoderRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({

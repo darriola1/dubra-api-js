@@ -19,8 +19,8 @@ ShippingRouter.post(
 );
 
 // Listar todos los envíos de una orden
-ShippingRouter.get("/order/:orderId/shippings", AuthMiddleware, (req, res) =>
-  shippingController.findByOrder(req, res)
+ShippingRouter.get("/users/:userId/shippings", AuthMiddleware, (req, res) =>
+  shippingController.findByUser(req, res)
 );
 
 // Obtener un envío por ID
@@ -35,6 +35,9 @@ ShippingRouter.put(
   ValidateBody(updateShippingSchema),
   (req, res) => shippingController.update(req, res)
 );
+
+// Listar todos los envíos
+ShippingRouter.get('/', AuthMiddleware, (req, res) => shippingController.findAll(req, res));
 
 // Eliminar un envío
 ShippingRouter.delete("/:id", AuthMiddleware, (req, res) =>

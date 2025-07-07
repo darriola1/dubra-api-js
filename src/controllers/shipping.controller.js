@@ -18,10 +18,10 @@ export class ShippingController {
     }
   }
 
-  findByOrder = async (req, res) => {
-    const { orderId } = req.params
+  findByUser = async (req, res) => {
+    const { userId } = req.params
     try {
-      const shippings = await shippingModel.findShippingsByOrder(parseInt(orderId))
+      const shippings = await shippingModel.findShippingsByUser(parseInt(userId))
       res.status(200).json({ shippings })
     } catch (err) {
       logger.error('Error al obtener envíos de la orden:', err)
@@ -40,6 +40,30 @@ export class ShippingController {
       res.status(500).json({ error: 'Error interno' })
     }
   }
+
+  findAll = async (req, res) => {
+    const { search, status, limit, offset } = req.query;
+
+    // Paginación
+    const parsedLimit = !isNaN(Number(limit)) ? parseInt(limit) : 10;  // 10 como valor por defecto, es el número de shippings por página
+    const parsedOffset = !isNaN(Number(offset)) ? parseInt(offset) : 0;  // 0 como valor por defecto, es el valor inicial para la paginación
+
+    try {
+      // Llamada al modelo para obtener los envíos
+      const result = await shippingModel.findAllShippings({
+        search: typeof search === 'string' ? search : undefined,
+        status: typeof status === 'string' ? status : undefined,
+        limit: parsedLimit,
+        offset: parsedOffset,
+      });
+
+      // Enviar la respuesta con los envíos encontrados y el total
+      res.status(200).json(result); 
+    } catch (err) {
+      logger.error('Error al listar envíos:', err);
+      res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
 
   update = async (req, res) => {
     const { id } = req.params

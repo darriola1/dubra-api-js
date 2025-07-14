@@ -90,6 +90,7 @@ export class AuthController {
             email: user.email,
             name: user.name,
             role: user.role,
+            customerId: user.customerId,        
           },
         });
     } catch (err) {
@@ -149,6 +150,7 @@ export class AuthController {
         email: user.email,
         name: user.name,
         role: user.role,
+        customerId: user.customerId,        
       };
 
       res.status(200).json({ user: data });

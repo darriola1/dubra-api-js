@@ -16,7 +16,12 @@ export const findAllInvoices = async () => {
 };
 
 export const findInvoiceById = async (id) => {
-  return prisma.invoice.findUnique({ where: { id } });
+  return prisma.invoice.findUnique({
+    where: { id }, include: {
+      movement: true,
+      customer: true,
+    },
+  });
 };
 
 export const findInvoicesByCustomer = async (customerId) => {

@@ -72,4 +72,26 @@ export class InvoiceController {
       res.status(500).json({ error: error.message });
     }
   };
+
+    // Subir archivo de factura
+  uploadFile = async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ error: "No se envió ningún archivo." });
+    }
+
+    try {
+      const base64 = file.buffer.toString("base64");
+
+      await InvoiceModel.updateInvoice(id, { fileBase64: base64 });
+
+      const updatedInvoice = await InvoiceModel.findInvoiceById(id);
+
+      res.status(200).json(updatedInvoice);
+    } catch (error) {
+      res.status(500).json({ error: "Error al subir archivo." });
+    }
+  };
 }

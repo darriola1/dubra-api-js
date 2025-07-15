@@ -51,13 +51,12 @@ export class PaymentController {
                     amount: parseFloat(amount),
                 },
             };
-
+            
             const response = await preference.create({ body: preferenceData });
 
             if (!response.init_point) {
                 return res.status(500).json({ error: "No se pudo generar el link de pago" });
             }
-
             return res.status(200).json({ init_point: response.init_point });
         } catch (error) {
             return res.status(500).json({ error: "Error generando preferencia" });
@@ -101,7 +100,6 @@ export class PaymentController {
             });
 
             if (!deuda) {
-                console.warn(`No se encontró deuda para invoiceId=${invoiceId}`);
                 return res.sendStatus(404);
             }
 
@@ -109,10 +107,13 @@ export class PaymentController {
             await prisma.balanceMovement.update({
                 where: { id: deuda.id },
                 data: {
+                    customerId: deuda.customerId,
+                    invoiceId: deuda.invoiceId,
                     amount: Math.abs(deuda.amount),
                     mpPaymentId,
                     metodo,
                     estado: status,
+                    amountAfter: 0 
                 }
             });
 

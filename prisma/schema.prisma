@@ -62,9 +62,9 @@ model Shipping {
 
   Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
   invoiceId Int?
-  
-  userId                Int?
-  User                  User?                   @relation(fields: [userId], references: [id])
+
+  userId Int?
+  User   User? @relation(fields: [userId], references: [id])
 
   ShippingStatusHistory ShippingStatusHistory[]
 }
@@ -87,22 +87,28 @@ enum ShippingStatus {
 model Invoice {
   id         Int               @id @default(autoincrement())
   number     String
-  fileBase64 String
+  fileBase64  String? @db.LongText
   createdAt  DateTime          @default(now())
   customerId Int
   customer   Customer          @relation(fields: [customerId], references: [id])
   shippings  Shipping[]
-  movements  BalanceMovement[]
+
+  movement   BalanceMovement?  @relation("InvoiceToMovement", fields: [movementId], references: [id])
+  movementId Int?              @unique
 }
 
 model BalanceMovement {
   id          Int      @id @default(autoincrement())
   description String
-  amount      Int // negativo = deuda, positivo = pago
+  amount      Float
+  amountAfter Float
   customerId  Int
   customer    Customer @relation(fields: [customerId], references: [id])
-  invoiceId   Int?
-  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+  invoice     Invoice? @relation("InvoiceToMovement")
+
+  mpPaymentId String?  @unique
+  metodo      String?
+  estado      String?
   createdAt   DateTime @default(now())
 
   @@map("Balance")

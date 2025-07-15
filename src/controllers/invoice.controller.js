@@ -14,9 +14,28 @@ export class InvoiceController {
 
   // Obtener todas las facturas
   getAllInvoices = async (req, res) => {
+    const { search, status, customerId, limit, offset, fromDate, toDate } = req.query;
+
+    // Paginación
+    const parsedLimit = !isNaN(Number(limit)) ? parseInt(limit) : 10; // 10 por defecto
+    const parsedOffset = !isNaN(Number(offset)) ? parseInt(offset) : 0; // 0 por defecto
+
     try {
-      const invoices = await InvoiceModel.findAllInvoices();
-      res.status(200).json(invoices);
+      // Llamada al modelo para obtener las facturas con filtros y paginación
+      const result = await InvoiceModel.findAllInvoices({
+        search: typeof search === 'string' ? search : undefined,
+        status: typeof status === 'string' ? status.toLowerCase() : undefined,
+        customerId: customerId ? parseInt(customerId) : undefined,
+        fromDate: fromDate ? new Date(fromDate + "T00:00:00") : undefined,
+        toDate: toDate ? new Date(toDate + "T23:59:59") : undefined,
+        limit: parsedLimit,
+        offset: parsedOffset,
+      });
+
+      res.status(200).json({
+        rows: result.rows,
+        total: result.total
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -38,15 +57,30 @@ export class InvoiceController {
 
   // Obtener las facturas de un cliente
   getInvoicesByCustomer = async (req, res) => {
-    const { customerId } = req.params;
+    const customerId = parseInt(req.params.customerId, 10);
+    const { search, status, fromDate, toDate, limit, offset } = req.query;
+
+    if (isNaN(customerId)) {
+      return res.status(400).json({ error: 'The customerId parameter must be a valid number.' });
+    }
+
+    const parsedLimit = !isNaN(Number(limit)) ? parseInt(limit) : 10;
+    const parsedOffset = !isNaN(Number(offset)) ? parseInt(offset) : 0;
+
     try {
-      const invoices = await InvoiceModel.findInvoicesByCustomer(customerId);
-      if (!invoices || invoices.length === 0) {
-        return res.status(404).json({ error: 'No invoices found for this customer' });
-      }
-      res.status(200).json(invoices);
+      const invoices = await InvoiceModel.findInvoicesByCustomer({
+        customerId,
+        search: search || undefined,
+        status: status || undefined,
+        fromDate: fromDate ? new Date(fromDate + "T00:00:00") : undefined,
+        toDate: toDate ? new Date(toDate + "T23:59:59") : undefined,
+        limit: parsedLimit,
+        offset: parsedOffset,
+      });
+
+      return res.status(200).json(invoices || []);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: 'Internal server error.' });
     }
   };
 

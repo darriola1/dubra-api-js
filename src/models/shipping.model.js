@@ -27,33 +27,35 @@ export const findShippingsByUser = async (userId) => {
   })
 }
 
-export const findAllShippings = async ({ search, status, limit, offset }) => {
-  try {
-    const shippings = await prisma.shipping.findMany({
-      where: {
-        // Filtrado por búsqueda de texto (en direcciones, nombres, etc.)
-        AND: [
-          search ? {
-            OR: [
-              { fromAddress: { contains: search, mode: 'insensitive' } },
-              { toAddress: { contains: search, mode: 'insensitive' } },
-              { contactName: { contains: search, mode: 'insensitive' } },
-            ]
-          } : {},
-          status ? { status: status } : {},
+export const findAllShippings = async ({ search, status, fromDate, toDate, limit, offset, userId, customerId }) => {
+  const where = {
+    AND: [
+      userId ? { userId } : {},
+      customerId ? { User: { customerId } } : {}, // 👈 filtro por empresa
+      search ? {
+        OR: [
+          { fromAddress: { contains: search } },
+          { toAddress: { contains: search } },
+          { contactName: { contains: search } },
         ]
-      },
-      take: limit,  // Limitar los resultados
-      skip: offset, // Desplazamiento para la paginación
-      orderBy: {
-        createdAt: 'desc'  // Ordenar por fecha de creación
-      }
-    });
+      } : {},
+      status ? { status } : {},
+      fromDate ? { createdAt: { gte: new Date(fromDate) } } : {},
+      toDate ? { createdAt: { lte: new Date(toDate) } } : {},
+    ],
+  };
 
-    return shippings;
-  } catch (err) {
-    throw new Error('Error al obtener los envíos: ' + err.message);
-  }
+  const [items, total] = await Promise.all([
+    prisma.shipping.findMany({
+      where,
+      take: limit,
+      skip: offset,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.shipping.count({ where }),
+  ]);
+
+  return { items, total };
 };
 
 export const updateShipping = async (id, data) => {

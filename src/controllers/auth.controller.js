@@ -70,7 +70,7 @@ export class AuthController {
       if (!match)
         return res.status(401).json({ error: "Credenciales inválidas" });
 
-      const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, {
+      const token = jwt.sign({ userId: user.id, role: user.role, customerId: user.customerId }, JWT_SECRET, {
         expiresIn: "24h",
       });
 

@@ -1,5 +1,3 @@
-// prisma/seed.js
-
 import { PrismaClient } from '@prisma/client';
 import bcrypt from "bcrypt";
 
@@ -22,22 +20,27 @@ function randomInt(min, max) {
 }
 
 async function main() {
-  console.log('🌱 Seed empezando...');
+  await prisma.shippingStatusHistory.deleteMany();
+  await prisma.shipping.deleteMany();
+  await prisma.balanceMovement.deleteMany();
+  await prisma.invoice.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.customer.deleteMany();
 
-  // 1) Insertar customers
+  console.log('🌱 Iniciando seed...');
+
   const createdCustomers = [];
   for (const c of customers) {
     const cust = await prisma.customer.create({ data: c });
     createdCustomers.push(cust);
   }
 
-  // 2) Insertar admins con password hasheado
+  // Crear admins
   for (const a of admins) {
     const hashedPassword = bcrypt.hashSync(a.password, 10);
     await prisma.user.create({ data: { ...a, password: hashedPassword } });
   }
 
-  // 3) Insertar users (5 por cada customer) con password hasheado
   const createdUsers = [];
   for (const cust of createdCustomers) {
     for (let i = 1; i <= 5; i++) {
@@ -58,72 +61,58 @@ async function main() {
     }
   }
 
-  // 4) Crear orders, shippings, historial, invoices y movimientos por cada user
   const statuses = ["pendiente", "en_camino", "entregado", "cancelado"];
-
   let invoiceCounter = 1;
 
   for (const user of createdUsers) {
-    const orderCount = randomInt(1, 3);
-    for (let o = 1; o <= orderCount; o++) {
-      // Crear order
-      const order = await prisma.order.create({
+    const shippingCount = randomInt(1, 3);
+    for (let s = 1; s <= shippingCount; s++) {
+      // Crear movimiento financiero primero
+      const movement = await prisma.balanceMovement.create({
         data: {
-          description: `Pedido ${o} para ${user.email}`,
-          userId: user.id,
+          description: `Movimiento asociado a INV-${invoiceCounter.toString().padStart(5, '0')}`,
+          amount: invoiceCounter % 2 === 0
+            ? randomInt(10, 99)  // pago
+            : -randomInt(10, 99), // deuda
+          amountAfter: 0,
+          customerId: user.customerId,
           createdAt: new Date(),
-          updatedAt: new Date()
+          estado: invoiceCounter % 2 === 0 ? 'approved' : 'pending' // ejemplo de estado
+        }
+      });
+
+      // Crear invoice con referencia al movimiento
+      const invoice = await prisma.invoice.create({
+        data: {
+          number: `INV-${invoiceCounter.toString().padStart(5, '0')}`,
+          customerId: user.customerId,
+          createdAt: new Date(),
+          movementId: movement.id
         }
       });
 
       // Crear shipping
-      await prisma.shipping.create({
+      const shipping = await prisma.shipping.create({
         data: {
-          orderId: order.id,
-          fromAddress: `Almacén Principal ${user.customerId}`,
-          toAddress: `Dirección cliente pedido ${order.id}`,
+          fromAddress: `Almacén Central ${user.customerId}`,
+          toAddress: `Dirección Cliente ${user.id}-${s}`,
           contactName: user.name,
-          contactPhone: `0999${1000 + order.id}`,
-          trackingId: `TRACK${order.id.toString().padStart(6, '0')}`,
-          status: statuses[Math.floor(Math.random() * statuses.length)],
+          contactPhone: `0999${1000 + s}`,
+          trackingId: `DUB-${invoiceCounter.toString().padStart(6, '0')}`,
+          status: statuses[randomInt(0, statuses.length - 1)],
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          invoiceId: invoice.id,
+          userId: user.id
         }
       });
 
-      // Crear shippingStatusHistory
+      // Crear historial de estado
       await prisma.shippingStatusHistory.create({
         data: {
-          orderId: order.id,
+          shippingId: shipping.id,
           status: 'pendiente',
           changedAt: new Date()
-        }
-      });
-
-      // Crear invoice
-      const invoice = await prisma.invoice.create({
-        data: {
-          number: `INV-${invoiceCounter.toString().padStart(5, '0')}`,
-          fileBase64: Buffer.from(`Factura ${invoiceCounter}`).toString('base64'),
-          customerId: user.customerId,
-          createdAt: new Date()
-        }
-      });
-
-      // Actualizar order con invoiceId
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { invoiceId: invoice.id }
-      });
-
-      // Crear balanceMovement
-      await prisma.balanceMovement.create({
-        data: {
-          description: `Movimiento para factura INV-${invoiceCounter.toString().padStart(5, '0')}`,
-          amount: invoiceCounter % 2 === 0 ? 15000 : -7500,
-          customerId: user.customerId,
-          invoiceId: invoice.id,
-          createdAt: new Date()
         }
       });
 

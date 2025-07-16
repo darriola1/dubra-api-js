@@ -4,7 +4,6 @@ import { AuthMiddleware } from "../middlewares/auth.middleware.js";
 import { AuthController } from "../controllers/auth.controller.js";
 import { RegisterSchema, LoginSchema, ChangePasswordSchema } from '../schemas/auth.schema.js';
 import { authLimiter } from "../middlewares/rate-limiter.js";
-// import { authLimiter } from '@/shared/middlewares/rateLimiter.js';
 
 export const AuthRouter = Router();
 const authController = new AuthController()

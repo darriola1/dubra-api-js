@@ -9,6 +9,7 @@ export const createUser = async (userData) => {
       email: userData.email,
       password: userData.password,
       role: userData.role || "user", // Default role is 'user'
+      customerId: userData.customerId, 
     },
   });
 };
@@ -24,7 +25,6 @@ export const findUserById = async (userId) => {
     });
     return user;
   } catch (err) {
-    console.error("Error en la consulta de usuario:", err);
     throw new Error('No se pudo encontrar el usuario');
   }
 };

@@ -35,19 +35,20 @@ model Customer {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique(map: "Usuario_email_key")
+  id         Int        @id @default(autoincrement())
+  email      String     @unique(map: "Usuario_email_key")
   name       String
   password   String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime?  @updatedAt
   customerId Int?
-  customer   Customer? @relation(fields: [customerId], references: [id], map: "Usuario_empresaId_fkey")
+  customer   Customer?  @relation(fields: [customerId], references: [id], map: "Usuario_empresaId_fkey")
   orders     Order[]
-  role      String   @default("user")
+  role       String     @default("user")
+  Shipping   Shipping[]
+
   @@index([customerId], map: "User_customerId_fkey")
 }
-
 
 model Order {
   id                    Int                     @id @default(autoincrement())
@@ -76,14 +77,24 @@ model Shipping {
   status       ShippingStatus @default(pendiente)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  }
+
+  Invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+  invoiceId Int?
+
+  userId Int?
+  User   User? @relation(fields: [userId], references: [id])
+
+  ShippingStatusHistory ShippingStatusHistory[]
+}
 
 model ShippingStatusHistory {
-  id        Int            @id @default(autoincrement())
-  orderId   Int
-  order     Order          @relation(fields: [orderId], references: [id])
-  status    ShippingStatus
-  changedAt DateTime       @default(now())
+  id         Int            @id @default(autoincrement())
+  orderId    Int
+  order      Order          @relation(fields: [orderId], references: [id])
+  status     ShippingStatus
+  changedAt  DateTime       @default(now())
+  Shipping   Shipping?      @relation(fields: [shippingId], references: [id])
+  shippingId Int?
 }
 
 enum ShippingStatus {
@@ -94,24 +105,31 @@ enum ShippingStatus {
 }
 
 model Invoice {
-  id         Int               @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   number     String
-  fileBase64 String
-  createdAt  DateTime          @default(now())
+  fileBase64 String?    @db.LongText
+  createdAt  DateTime   @default(now())
   customerId Int
-  customer   Customer          @relation(fields: [customerId], references: [id])
-  orders     Order[]
-  movements  BalanceMovement[]
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  shippings  Shipping[]
+
+  movement   BalanceMovement? @relation("InvoiceToMovement", fields: [movementId], references: [id])
+  movementId Int?             @unique
+  Order      Order[]
 }
 
 model BalanceMovement {
   id          Int      @id @default(autoincrement())
   description String
-  amount      Int // negativo = deuda, positivo = pago
+  amount      Float
+  amountAfter Float
   customerId  Int
   customer    Customer @relation(fields: [customerId], references: [id])
-  invoiceId   Int?
-  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+  invoice     Invoice? @relation("InvoiceToMovement")
+
+  mpPaymentId String?  @unique
+  metodo      String?
+  estado      String?
   createdAt   DateTime @default(now())
 
   @@map("Balance")

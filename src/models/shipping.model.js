@@ -27,6 +27,37 @@ export const findShippingsByOrder = async (orderId) => {
   })
 }
 
+export const findAllShippings = async ({ search, status, fromDate, toDate, limit, offset, userId, customerId }) => {
+  const where = {
+    AND: [
+      userId ? { userId } : {},
+      customerId ? { User: { customerId } } : {}, // 👈 filtro por empresa
+      search ? {
+        OR: [
+          { fromAddress: { contains: search } },
+          { toAddress: { contains: search } },
+          { contactName: { contains: search } },
+        ]
+      } : {},
+      status ? { status } : {},
+      fromDate ? { createdAt: { gte: new Date(fromDate) } } : {},
+      toDate ? { createdAt: { lte: new Date(toDate) } } : {},
+    ],
+  };
+
+  const [items, total] = await Promise.all([
+    prisma.shipping.findMany({
+      where,
+      take: limit,
+      skip: offset,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.shipping.count({ where }),
+  ]);
+
+  return { items, total };
+};
+
 export const updateShipping = async (id, data) => {
   return prisma.shipping.update({
     where: { id },

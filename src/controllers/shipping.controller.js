@@ -28,7 +28,7 @@ export class ShippingController {
       res.status(500).json({ error: 'Error interno al listar envíos' })
     }
   }
-  
+
   findById = async (req, res) => {
     const { id } = req.params
     try {
@@ -40,6 +40,35 @@ export class ShippingController {
       res.status(500).json({ error: 'Error interno' })
     }
   }
+
+  findAll = async (req, res) => {
+    const { search, status, limit, offset, fromDate, toDate } = req.query;
+    const parsedLimit = !isNaN(Number(limit)) ? parseInt(limit) : 10;
+    const parsedOffset = !isNaN(Number(offset)) ? parseInt(offset) : 0;
+
+    try {
+      let customerFilter = undefined;
+      // Si no es admin, filtra por la empresa del usuario autenticado
+      if (req.user.role !== 'admin') {
+        customerFilter = req.user.customerId;
+      }
+
+      const { items, total } = await shippingModel.findAllShippings({
+        search,
+        status,
+        fromDate,
+        toDate,
+        limit: parsedLimit,
+        offset: parsedOffset,
+        customerId: customerFilter,
+      });
+
+      res.status(200).json({ items, total });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
 
   update = async (req, res) => {
     const { id } = req.params

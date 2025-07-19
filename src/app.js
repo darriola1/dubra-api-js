@@ -1,19 +1,25 @@
 // imports de paquetes
 import express, { json } from "express";
 import dotenv from "dotenv";
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
+import cors from "cors";
+import cookieParser from "cookie-parser";
 // imports de servicios
 
 // imports de codigo nuestro
-import {AuthRouter} from "./routes/auth.routes.js";
-import {OrderRouter} from './routes/order.routes.js'
-import {ShippingRouter} from './routes/shipping.routes.js';
+import { AuthRouter } from "./routes/auth.routes.js";
+import { ShippingRouter } from "./routes/shipping.routes.js";
+import { UserRouter } from "./routes/user.routes.js";
+import { CustomerRouter } from "./routes/customer.routes.js";
+import { InvoiceRouter } from "./routes/invoice.routes.js";
+import { PaymentRouter } from "./routes/payment.routes.js";
+import { BalanceMovementRouter } from "./routes/balanceMovement.routes.js";
+import { GeocoderRouter } from "./routes/geocoder.routes.js";
+import { EmailRouter } from "./routes/email.routes.js";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.APP_PORT || 3003;
+const PORT = process.env.APP_PORT || 3000;
 // Configuración de CORS
 // Agregar ruta del front cuando este deployado
 app.use(
@@ -46,8 +52,14 @@ app.get("/", (_req, res) => {
 
 // Rutas
 app.use("/api/auth", AuthRouter);
-app.use("/api/order", OrderRouter);
+app.use("/api/user", UserRouter);
+app.use("/api/customer", CustomerRouter);
 app.use("/api/shipping", ShippingRouter);
+app.use("/api/invoice", InvoiceRouter);
+app.use("/api/payment", PaymentRouter);
+app.use("/api/balance-movement", BalanceMovementRouter);
+app.use("/api/geocoder", GeocoderRouter);
+app.use("/api/email", EmailRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({

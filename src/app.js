@@ -46,7 +46,7 @@ app.use(cookieParser());
 // Se deshabilita el header 'x-powered-by' por "seguridad".
 app.disable("x-powered-by");
 // Ruta base para verificar que la API está funcionando
-app.get("/", (_req, res) => {
+app.get("/api/health", (_req, res) => {
   res.send(`🚀 Dubra API funcionando correctamente ${PORT}`);
 });
 
@@ -56,7 +56,7 @@ app.use("/api/user", UserRouter);
 app.use("/api/customer", CustomerRouter);
 app.use("/api/shipping", ShippingRouter);
 app.use("/api/invoice", InvoiceRouter);
-app.use("/api/payment", PaymentRouter); 
+app.use("/api/payment", PaymentRouter);
 app.use("/api/balance-movement", BalanceMovementRouter);
 app.use("/api/geocoder", GeocoderRouter);
 app.use("/api/email", EmailRouter);
